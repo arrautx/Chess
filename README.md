@@ -1,3 +1,8 @@
+# Chess
+> *Chess - Multiplayer chess game with ws*
+
+https://youtu.be/Nj-6DnISXMU?si=XB4s0PJLkbyly5lI
+
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.
