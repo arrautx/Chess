@@ -1,0 +1,40 @@
+// Prisma schema for @repo/db — PostgreSQL (Neon)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  username  String   @unique
+  password  String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  whiteGames Game[] @relation("WhitePlayer")
+  blackGames Game[] @relation("BlackPlayer")
+
+  @@map("users")
+}
+
+model Game {
+  id              Int      @id @default(autoincrement())
+  fen             String   @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  whitePlayerId   Int?
+  blackPlayerId   Int?
+  whitePlayerName String?
+  blackPlayerName String?
+  status          String   @default("waiting") // waiting | active | finished
+  result          String?                       // 1-0 | 0-1 | 1/2-1/2
+  turn            String   @default("w")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  whitePlayer User? @relation("WhitePlayer", fields: [whitePlayerId], references: [id])
+  blackPlayer User? @relation("BlackPlayer", fields: [blackPlayerId], references: [id])
+
+  @@map("games")
+}

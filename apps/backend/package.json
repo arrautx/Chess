@@ -5,16 +5,28 @@
   "private": true,
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/express": "^5.0.6"
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.4.1",
+    "tsx": "^4.23.13"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "check-types": "tsc --noEmit"
+  },
   "dependencies": {
+    "@repo/db": "workspace:*",
     "@repo/shared": "workspace:*",
+    "@types/cors": "^2.8.19",
+    "argon2": "^0.45.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "@types/cors": "^2.8.19"
+    "jsonwebtoken": "^9.0.3",
+    "zod": "^4.4.3"
   }
 }
