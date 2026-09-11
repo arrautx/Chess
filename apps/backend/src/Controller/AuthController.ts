@@ -20,8 +20,6 @@ export const signUp = async function (req: Request, res: Response) {
   const { name, username, password } = parsed.data;
 
   try {
-    // No pre-check for existing username — the DB unique constraint handles it
-    // (P2002 below). Saves a ~275ms round-trip to the remote DB on every signup.
     const hashedPassword = await hashPassword(password);
 
     const user = await createUser(name, username, hashedPassword);
@@ -67,7 +65,7 @@ export const signIn = async function (req: Request, res: Response) {
     const t0 = performance.now();
     const user: User | null = await findUserByUsername(username);
     console.log(`[timing] findUserByUsername: ${Math.round(performance.now() - t0)}ms`);
-    // user.password is null for legacy OAuth-only accounts — they can't sign in with a password
+
     if (!user || !user.password) {
       res.status(401).json({ message: "Invalid username or password" });
       return;

@@ -13,7 +13,6 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET not set in ws-backend/.env");
 }
 
-// ── Room ──────────────────────────────────────────────────
 interface Room {
   code: string;
   chess: Chess;
@@ -27,8 +26,6 @@ interface Room {
 
 const rooms = new Map<string, Room>();
 const wsToRoom = new Map<WebSocket, string>();
-
-// ── Generate 6-char room code ─────────────────────────────
 function generateCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 to avoid confusion
   let code = "";
@@ -38,7 +35,6 @@ function generateCode(): string {
   return rooms.has(code) ? generateCode() : code;
 }
 
-// ── Auth ──────────────────────────────────────────────────
 function authenticate(token: string): { userId: number; username: string } | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as unknown as {
@@ -54,7 +50,6 @@ function authenticate(token: string): { userId: number; username: string } | nul
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────
 function send(ws: WebSocket, msg: ServerMessage) {
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(msg));
@@ -95,7 +90,6 @@ function checkGameOver(room: Room): boolean {
   return true;
 }
 
-// ── Handle messages ───────────────────────────────────────
 function handleMessage(ws: WebSocket, raw: string) {
   let msg: ClientMessage;
   try {
@@ -106,7 +100,7 @@ function handleMessage(ws: WebSocket, raw: string) {
   }
 
   switch (msg.type) {
-    // ── CREATE ROOM ──────────────────────────────────────
+
     case "create_room": {
       const user = authenticate(msg.token);
       if (!user) {
@@ -141,7 +135,6 @@ function handleMessage(ws: WebSocket, raw: string) {
       break;
     }
 
-    // ── JOIN ROOM ────────────────────────────────────────
     case "join_room": {
       const user = authenticate(msg.token);
       if (!user) {
@@ -210,13 +203,12 @@ function handleMessage(ws: WebSocket, raw: string) {
       break;
     }
 
-    // ── LEAVE ROOM ───────────────────────────────────────
+
     case "leave_room": {
       leaveCurrentRoom(ws);
       break;
     }
 
-    // ── MOVE ─────────────────────────────────────────────
     case "move": {
       const room = rooms.get(msg.code);
       if (!room) {
@@ -237,7 +229,7 @@ function handleMessage(ws: WebSocket, raw: string) {
         return;
       }
 
-      // Must be your turn
+
       if (room.chess.turn() !== color) {
         send(ws, {
           type: "invalid_move",
@@ -272,7 +264,6 @@ function handleMessage(ws: WebSocket, raw: string) {
       break;
     }
 
-    // ── RESIGN ───────────────────────────────────────────
     case "resign": {
       const room = rooms.get(msg.code);
       if (!room) {
@@ -301,7 +292,6 @@ function handleMessage(ws: WebSocket, raw: string) {
   }
 }
 
-// ── Leave current room ────────────────────────────────────
 function leaveCurrentRoom(ws: WebSocket) {
   const code = wsToRoom.get(ws);
   if (!code) return;
@@ -336,7 +326,6 @@ function leaveCurrentRoom(ws: WebSocket) {
   wsToRoom.delete(ws);
 }
 
-// ── HTTP + WebSocket server ───────────────────────────────
 const server = createServer((req, res) => {
   if (req.url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
